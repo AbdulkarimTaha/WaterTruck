@@ -12,35 +12,24 @@ const app = express();
 app.use(express.json());
 
 
-const saltRounds = 10;
-const creatingTable = "CREATE TABLE clients (id SERIAL PRIMARY KEY,username VARCHAR(255),email VARCHAR(255),name VARCHAR(255),phone VARCHAR(255) , password VARCHAR(255));";
-
-
 
 
  app.post('/SignUp', (req, res) => {
+    
+
     const signUpPage = require('./src/routes/auth/signup');
-    signUpPage.signUpMethod(req.body, function(ret){
-        res.status(200).json(ret)
+    signUpPage.signUpMethod(req.body, function(result){
+        const {status , token , code} = result ;
+        res.status(code).json({
+            "status" : status ,
+            "token" : token 
+        });
     }) ;
-  
+}); 
 
-    // const { status, token } = m;
-    // if (status == 'success') {
-    //     res.status(200).json({
-    //         status: 'success',
-    //         token,
-    //     });
-    // } else {
-    //     res.status(400).json({
-    //         status: token ,
-    //     });
-    // }
-  
-});
-//Todo : all cases + username(generated) 
+
+
 app.post('/login', (req, res) => {
-
     var qlTe = 'SELECT * FROM clients WHERE phone = ?';
     db.query(qlTe, [req.body.phone], function (err, result) {
         if (err) throw err;
@@ -69,13 +58,7 @@ app.post('/login', (req, res) => {
 });
 
 
-app.post("/test", (req, res) => {
-
-
-});
-
 app.listen('3000', () => {
-    console.log("worked");
 })
 
 

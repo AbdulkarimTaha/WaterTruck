@@ -6,94 +6,90 @@ const saltRounds = 10;
 const jwtExpirySeconds = 4320000;
 var db = configDb.db;
 
+const qry = "INSERT INTO clients (username,email,name,phone,password) VALUES (? , ? , ? , ? , ?)";
+const uqry = "SELECT phone FROM clients WHERE phone = ?"
 
- function signUpMethod(body , callback)  {
-    const username = GeneratedUserName();
+
+
+
+function signUpMethod(body, callback) {
     const { name, email, phone, password } = body;
-    encrptionPa(username,name,email,phone,password ,function(re){
-    return callback(re);
-    });   
+    if (password.length < 6 ) {
+        return callback({
+            "status": "failed",
+            "token": "null",
+            code: 400
+        });
+    } else {
+        db.query(uqry, [phone], function (err, result) {
+            if (err) return callback({
+                "status": "failed",
+                "token": "null",
+                code: 500
+            });
+
+            if (result != 0) {
+                return callback({
+                    "status": "failed",
+                    "token": "null",
+                    code: 409
+                });
+            } else {
+                const username = GeneratedUserName();
+
+                encrptionPa(username, name, email, phone, password, function (re) {
+                    return callback(re);
+                });
+            }
+        });
+    }
 }
 
- function encrptionPa( username, name, email, phone, password , callback){
-    var encrpt = bcrypt.hash(password, saltRounds, function (err, hash) {
+
+function encrptionPa(username, name, email, phone, password, callback) {
+    bcrypt.hash(password, saltRounds, function (err, hash) {
         if (err) {
             return callback({
                 "status": "failed",
-                "token": "no"
+                "token": "null",
+                code: 500
             });
         }
-         insertOnDataBase(username, email, name, phone, hash , function (re){
-       
-         return callback(re)
-         
+        insertOnDataBase(username, email, name, phone, hash, function (re) {
+
+            return callback(re)
+
         });
-       
+
     });
 }
 
 
- function insertOnDataBase(username, email, name, phone, hash , callback) {
-    const qry = "INSERT INTO clients (username,email,name,phone,password) VALUES (? , ? , ? , ? , ?)";
-    var u = db.query(qry, [username, email, name, phone, hash], async function (err, result) {
+function insertOnDataBase(username, email, name, phone, hash, callback) {
+    db.query(qry, [username, email, name, phone, hash], async function (err, result) {
         if (err) {
-         return callback ({
+            return callback({
                 "status": "failed",
-                "token": "what" 
+                "token": "null",
+                code: 500
             });
         }
         var token = await makeToken(username, name, phone);
-        return callback ({
+        return callback({
             "status": "success",
-            "token": token
+            "token": token,
+            code: 200
         });
-    }); 
+    });
 }
 
-
-
-// app.post('/SignUp', (req, res) => {
-//     const { username, email, name, phone, password } = req.body;
-//     bcrypt.hash(password, saltRounds, function (err, hash) {
-//         const qry = "INSERT INTO clients (username,email,name,phone,password) VALUES (? , ? , ? , ? , ?)";
-//         db.query(qry, [username, email, name, phone, hash], function (err, result) {
-//             if (err) throw err;
-//         });
-//     });
-//     const token = jwt.sign({ username, name, phone }, process.env.JWT_KEYWORD, {
-//         algorithm: "HS256",
-//         expiresIn: jwtExpirySeconds,
-//     })
-//     res.status(201).json({
-//         status: 'success',
-//         token,
-//     });
-
-// });
-
-
-    // const { status, token } = signFinish;
-    // if (status == 'success') {
-    //     res.status(200).json({
-    //         status: 'success',
-    //         token,
-    //     });
-    // } else {
-    //     res.status(500).json({
-    //         status: 'failed',
-
-    //     });
-    // }
-
-
-
-    function makeToken(username, name, phone) {
-        const token = jwt.sign({ username, name, phone }, process.env.JWT_KEYWORD, {
-            algorithm: "HS256",
-            expiresIn: jwtExpirySeconds,
-        });
-        return token;  
-    }
+function makeToken(username, name, phone) {
+    const token = jwt.sign({ username, name, phone }, process.env.JWT_KEYWORD, {
+        algorithm: "HS256",
+        expiresIn: jwtExpirySeconds,
+    });
+    return token;
+}
 
 function GeneratedUserName() {
     var randomNumber = Math.random();
