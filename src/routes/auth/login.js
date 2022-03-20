@@ -4,16 +4,17 @@ const jwt = require('jsonwebtoken');
 
 
 const jwtExpirySeconds = 4320000;
-const qlTe = 'SELECT * FROM clients WHERE phone = ?';
+const qryClientTable = 'SELECT * FROM clients WHERE phone = ?';
+const qryCustomerTable = 'SELECT * FROM customers WHERE phone = ?';
 var db = configDb.db;
 
+//customer Login
 
-
-function login(body, callback) {
+function customerLogin( body, callback){
     const bodyPhone = body.phone;
     const bodyPassword = body.password;
 
-    db.query(qlTe, [bodyPhone], function (err, result) {
+    db.query( qryCustomerTable, [bodyPhone], function (err, result) {
         if (err) return callback({
             "status": "failed",
             "token": "null",
@@ -51,6 +52,58 @@ function login(body, callback) {
     });
 }
 
+
+
+
+
+// Client Login
+function login(body, callback) {
+    const bodyPhone = body.phone;
+    const bodyPassword = body.password;
+
+    db.query(qryClientTable, [bodyPhone], function (err, result) {
+        if (err) return callback({
+            "status": "failed",
+            "token": "null",
+            "message" : "Server Error",
+            code: 500
+        });
+        if (result == 0) {
+            return callback({
+                "status": "failed",
+                "token": "null",
+                "message" : "User not exist",
+                code: 403
+            });
+        }
+        const { username, name, phone, password } = result[0];
+        bcrypt.compare(bodyPassword, password, async function (err, result) {
+            if (result) {
+                var token = await getToken(username, name, phone);
+                return callback({
+                    "status": "succses",
+                    "token": token,
+                    "message" : "loged in",
+                    code: 200
+                });
+            } else {
+                return callback({
+                    "status": "failed",
+                    "token": "null",
+                    "message" : "Wrong Password",
+                    code: 403
+                });
+            }
+        });
+
+    });
+}
+
+
+
+
+
+
 function getToken(username, name, phone) {
     const token = jwt.sign({ username, name, phone }, process.env.JWT_KEYWORD, {
         algorithm: "HS256",
@@ -62,3 +115,4 @@ function getToken(username, name, phone) {
 
 
 module.exports.login = login;
+module.exports.customerLogin = customerLogin;
