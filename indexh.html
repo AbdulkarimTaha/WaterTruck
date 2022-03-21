@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Hello world</title>
+   </head>
+   <script src = "/socket.io/socket.io.js"></script>
+   
+   <script>
+       const socket = io();
+//        socket.emit("update item", "1", { name: "updated" }, (response) => {
+//       console.log(response.status); // ok
+// });
+    //   const socket = io();
+         socket.emit('login',{userId:'truck'});
+    //   socket.on("hello", (arg) => {
+    //   console.log("clientererer" ,arg); 
+    //   });
+   </script>
+   <body>Hello World</body>
+</html>

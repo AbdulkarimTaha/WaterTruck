@@ -1,14 +1,60 @@
 require('dotenv').config();
 
+
 const crypto = require('crypto');
 const express = require('express');
-const config = require('./src/configs/dataBaseConfigs');
+const { Dir } = require('fs');
 const app = express();
-
-
+const server = require('http').createServer(app);
+const config = require('./src/configs/dataBaseConfigs');
+const io = require('socket.io')(server);
 
 app.use(express.json());
 
+let users = {};
+
+
+io.on('connection', function (socket) {
+    socket.on('login', function (data) {
+        console.log('a user ' + data.userId + ' connected 1');
+        // saving userId to object with socket ID
+        users[socket.id] = data.userId
+        console.log(users );
+     
+    });
+  
+    socket.on('disconnect', function () {
+        console.log('user ' + users[socket.id] + ' disconnected');
+        // remove saved socket from users object
+        delete users[socket.id];
+    });
+});
+
+// io.on('connection', function(socket){
+//  socket.on('login', function(data){
+//     console.log('a user ' + data.userId + ' connected 1');
+//     // saving userId to object with socket ID
+//     users[socket.id]= data.userId;  
+//   });
+
+//   socket.on('disconnect', function(){
+//     console.log('user ' + users[socket.id] + ' disconnected');
+//     // remove saved socket from users object
+//     delete users[socket.id];
+//   });
+// });
+
+
+
+// //Whenever someone connects this gets executed
+// io.on('connection', function(socket) {
+//     console.log('A user connected');
+
+//     //Whenever someone disconnects this piece of code executed
+//     socket.on('disconnect', function () {
+//        console.log('A user disconnected');
+//     });
+//  });
 
 app.post('/clientSignUp', (req, res) => {
     const signUpPage = require('./src/routes/auth/signup');
@@ -35,7 +81,7 @@ app.post('/clientLogin', (req, res) => {
     });
 });
 
-app.post('/customerSignUp', (req , res) => {
+app.post('/customerSignUp', (req, res) => {
     const signUpPage = require('./src/routes/auth/signup');
     signUpPage.customerSignUp(req.body, function (result) {
         const { status, token, code, message } = result;
@@ -48,7 +94,8 @@ app.post('/customerSignUp', (req , res) => {
 
 });
 
-app.post('/customerLogin', (req , res) => {
+app.post('/customerLogin', (req, res) => {
+
     const loginPage = require('./src/routes/auth/login');
     loginPage.customerLogin(req.body, function (result) {
         const { status, token, code, message } = result;
@@ -58,9 +105,20 @@ app.post('/customerLogin', (req , res) => {
             "message": message
         });
     });
-    
+
+});
+
+app.get('/showUser', function (req, res) {
+    res.status(200).json(users);
+    console.log(users ,"fefe");
+    console.dir(users , "rgerge" );
 });
 
 
-app.listen('3000', () => {
+app.get('/connect', async function (req, res) {  
+    res.sendFile('indexh.html', { root: __dirname });
+});
+
+
+server.listen('3000', () => {
 });
