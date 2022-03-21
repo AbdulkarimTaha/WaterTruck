@@ -6,6 +6,7 @@ const config = require('./src/configs/dataBaseConfigs');
 const app = express();
 
 
+
 app.use(express.json());
 
 
@@ -34,9 +35,6 @@ app.post('/clientLogin', (req, res) => {
     });
 });
 
-
-
-
 app.post('/customerSignUp', (req , res) => {
     const signUpPage = require('./src/routes/auth/signup');
     signUpPage.customerSignUp(req.body, function (result) {
@@ -49,7 +47,6 @@ app.post('/customerSignUp', (req , res) => {
     });
 
 });
-
 
 app.post('/customerLogin', (req , res) => {
     const loginPage = require('./src/routes/auth/login');
