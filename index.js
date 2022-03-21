@@ -30,31 +30,6 @@ io.on('connection', function (socket) {
     });
 });
 
-// io.on('connection', function(socket){
-//  socket.on('login', function(data){
-//     console.log('a user ' + data.userId + ' connected 1');
-//     // saving userId to object with socket ID
-//     users[socket.id]= data.userId;  
-//   });
-
-//   socket.on('disconnect', function(){
-//     console.log('user ' + users[socket.id] + ' disconnected');
-//     // remove saved socket from users object
-//     delete users[socket.id];
-//   });
-// });
-
-
-
-// //Whenever someone connects this gets executed
-// io.on('connection', function(socket) {
-//     console.log('A user connected');
-
-//     //Whenever someone disconnects this piece of code executed
-//     socket.on('disconnect', function () {
-//        console.log('A user disconnected');
-//     });
-//  });
 
 app.post('/clientSignUp', (req, res) => {
     const signUpPage = require('./src/routes/auth/signup');
