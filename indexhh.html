@@ -8,7 +8,7 @@
    <script>
        const socket = io();
 
-         socket.emit('readyToWork',{userId:'client1'});
+         socket.emit('readyToWork',{userId:'client2'});
          socket.on("hello", (arg) => {
          console.log("clientererer" ,arg); 
          const gg = document.getElementById('gg').textContent = arg.name ;

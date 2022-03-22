@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <title>customer</title>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+   const socket = io();
+
+   
+   socket.emit('AllUsers',{userId:'customer1323456'});
+ 
+
+    socket.on("connect", () => {
+    console.log(socket.id);   
+    });
+
+    socket.on("chat", (ad) => {
+    console.log(ad);   
+    });
+
+    socket.emit('askForUser',"looll");
+
+</script>
+
+<body>
+   <div id="gg"></div>
+   <button onclick="myFunction()">Click me</button>
+</body>
+
+</html>

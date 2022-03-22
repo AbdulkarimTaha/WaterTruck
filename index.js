@@ -11,23 +11,45 @@ const io = require('socket.io')(server);
 
 app.use(express.json());
 
+let customerId = {};
 let users = {};
 
+io.on("connection", (socket) => {
+    //print  the socket id
+    console.log(socket.id);
+   
+    socket.on('AllUsers' ,async function (data){
 
-io.on('connection', function (socket) {
-    socket.on('login', function (data) {
-        console.log('a user ' + data.userId + ' connected 1');
-        // saving userId to object with socket ID
-        users[socket.id] = data.userId
-        console.log(users );
-     
+        customerId[socket.id] = data.userId ;
+        await socket.join("room");
+       
     });
-  
-    socket.on('disconnect', function () {
-        console.log('user ' + users[socket.id] + ' disconnected');
-        // remove saved socket from users object
-        delete users[socket.id];
+
+    socket.on("askForUser", function (arg) {
+        console.log(arg);
+        io.sockets.in("room").emit('chat',"by");
     });
+       
+   
+
+});
+
+
+app.get('/client', function (req, res) {
+    res.sendFile('indexh.html', { root: __dirname });
+});
+app.get('/customer', function (req, res) {
+    res.sendFile('indexk.html', { root: __dirname });
+});
+
+app.post('/sendHi', function (req, res) {
+
+});
+
+app.get('/showUser', function (req, res) {
+
+    res.status(200).json({ users: users, customerId: customerId });
+
 });
 
 
@@ -82,18 +104,6 @@ app.post('/customerLogin', (req, res) => {
     });
 
 });
-
-app.get('/showUser', function (req, res) {
-    res.status(200).json(users);
-    console.log(users ,"fefe");
-    console.dir(users , "rgerge" );
-});
-
-
-app.get('/connect', async function (req, res) {  
-    res.sendFile('indexh.html', { root: __dirname });
-});
-
 
 server.listen('3000', () => {
 });
