@@ -12,9 +12,11 @@
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.0",
     "env": "^0.0.2",
+    "event-stream": "^4.0.1",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.4.1",
+    "socket.io-stream": "^0.9.1"
   }
 }

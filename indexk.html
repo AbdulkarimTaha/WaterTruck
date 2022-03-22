@@ -18,12 +18,18 @@
     console.log(socket.id);   
     });
 
+    socket.on("clientList", (ad) => {
+       console.log(ad);   
+    });
     socket.on("chat", (ad) => {
-    console.log(ad);   
+       console.log("chat = " , ad  );   
     });
 
     socket.emit('askForUser',"looll");
-
+    
+    function myFunction(){
+      socket.emit('askForUser',"looll");
+    }
 </script>
 
 <body>

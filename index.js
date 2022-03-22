@@ -14,23 +14,37 @@ app.use(express.json());
 let customerId = {};
 let users = {};
 
-io.on("connection", (socket) => {
-    //print  the socket id
-    console.log(socket.id);
+io.on("connection",  (socket) => {
+
    
-    socket.on('AllUsers' ,async function (data){
+
+    socket.on('AllUsers' , function (data){
 
         customerId[socket.id] = data.userId ;
-        await socket.join("room");
+        socket.join("room");
        
     });
 
-    socket.on("askForUser", function (arg) {
-        console.log(arg);
-        io.sockets.in("room").emit('chat',"by");
+    socket.on("askForUser", function (data) {
+        io.sockets.in("room").emit('chat',users);
     });
-       
+      
+ 
+
+     socket.on("readyForWork",  function (data) {
+        users[socket.id] = data.userId ;
+        socket.broadcast.emit("clientList", users);
+      
+    });
+     
+    
    
+
+    socket.on("disconnect", (reason) => {
+       delete users[socket.id];
+       delete customerId[socket.id] ;
+       socket.broadcast.emit("clientList", users);
+      });
 
 });
 
