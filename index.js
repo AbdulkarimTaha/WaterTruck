@@ -119,5 +119,12 @@ app.post('/customerLogin', (req, res) => {
 
 });
 
+
+app.post('/rateClient' , (req , res) =>{
+    const rateM = require('./rate');
+    rateM.rateClient(req.body, function(re){
+        console.log(re);
+    });
+});
 server.listen('3000', () => {
 });
