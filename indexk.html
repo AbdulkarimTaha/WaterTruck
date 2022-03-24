@@ -22,7 +22,11 @@ var data = {
       console.log("clientererer" , arg); 
       
     });
-
+    socket.on("myName", function (arg) {
+      
+      console.log("myName" , arg); 
+      
+    });
    function myFunction() {
       console.log("pre")
       socket.emit("askForTruck", {

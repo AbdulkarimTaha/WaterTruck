@@ -8,12 +8,19 @@
 
 <script>
    const socket = io();
-   var data = {
+   var data1 = {
    type  : "RFW" ,
    username: "myName" 
-}
-   socket.emit("WaterTruck", data);
-   socket.emit('readyForWork', { userId: 'client1' });
+   }
+
+   var data2 = {
+   type  : "CRBCAC" ,
+   username: "myName" ,
+   customerID :"myName" ,
+   roomName : "myName" ,
+   }
+   socket.emit("WaterTruck", data1);
+
    socket.on("connect", () => {
       console.log(socket.id);
    });
@@ -22,6 +29,9 @@
    socket.on('username', (data) => {
       console.log(data);
    });
+  function  myFunction(){
+   socket.emit("WaterTruck", data2);
+  }
 </script>
 
 <body>

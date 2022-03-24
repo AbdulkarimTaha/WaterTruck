@@ -34,10 +34,13 @@ io.on("connection", (socket) => {
             case "CRBCAC": //Create Room Between Clint and customer        
                 var customerID = data.customerID;
                 var roomName = data.roomName;
-                let socketB = Object.keys(cuSocket).find(key => cuSocket[key] === customerID);
+                let socketBID = Object.keys(cuSocket).find(key => cuSocket[key] === customerID);
+                const socketB = io.sockets.sockets.get(socketBID);
                 socket.join(onJoin(roomName));
-                socketB.join(onJoin(roomName));
+                socketB.join(onJoin2(socketB,roomName));
+                io.to(roomName).emit(roomName, "roomName");
                 break ;
+                
         }
     });
 
@@ -47,7 +50,12 @@ io.on("connection", (socket) => {
     //     io.to("customer").emit("chat", users);
 
     // });
-
+    function onJoin2(socketb ,room) {
+        var socketb = socketb ;
+        console.log("Joining room: " + room);
+        socketb.join(room);
+        console.log(socketb.id + " now in rooms ", socketb.rooms);
+    }
     function onJoin(room) {
         console.log("Joining room: " + room);
         socket.join(room);
@@ -77,7 +85,7 @@ app.get('/customer', function (req, res) {
 
 app.get('/showUser', function (req, res) {
 
-    res.status(200).json({ users: users, customerId: customerId });
+    res.status(200).json({ users: usersSocket, customerId: cuSocket });
 
 });
 
