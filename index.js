@@ -12,8 +12,8 @@ const io = require('socket.io')(server);
 
 app.use(express.json());
 
-let customerId = {};
-let users = {};
+let cuSocket = {};
+let usersSocket = {};
 
 var cuRoom = "customer";
 
@@ -21,43 +21,48 @@ io.on("connection", (socket) => {
 
     socket.on('WaterTruck', function (data) {
         var type = data.type;
-
         switch (type) {
             case "RFW": // Ready For Work
-                users[socket.id] = data.userId;
+                usersSocket[socket.id] = data.username;
+                io.to("customer").emit("chat", usersSocket);
                 break;
             case "AU": // Into All Users Room 
-                customerId[socket.id] = data.userId;
+                cuSocket[socket.id] = data.username;
                 socket.join(onJoin("customer"));
+                io.to("customer").emit("chat", usersSocket);
+                break;
+            case "CRBCAC": //Create Room Between Clint and customer        
+                var customerID = data.customerID;
+                var roomName = data.roomName;
+                let socketB = Object.keys(cuSocket).find(key => cuSocket[key] === customerID);
+                socket.join(onJoin(roomName));
+                socketB.join(onJoin(roomName));
                 break ;
-
-
         }
     });
-    socket.on('AllUsers', function (data) {
-        customerId[socket.id] = data.userId;
-        socket.join(onJoin("customer"));
-        io.to("customer").emit("chat", users);
 
-    });
+    // socket.on('AllUsers', function (data) {
+    //     customerId[socket.id] = data.userId;
+    //     socket.join(onJoin("customer"));
+    //     io.to("customer").emit("chat", users);
+
+    // });
 
     function onJoin(room) {
         console.log("Joining room: " + room);
         socket.join(room);
         console.log(socket.id + " now in rooms ", socket.rooms);
     }
-
-
-    socket.on("readyForWork", function (data) {
-        users[socket.id] = data.userId;
-        io.to("customer").emit("chat", users);
-    });
+    // socket.on("readyForWork", function (data) {
+    //     users[socket.id] = data.userId;
+    //     io.to("customer").emit("chat", users);
+    // });
 
 
     socket.on("disconnect", (reason) => {
-        delete users[socket.id];
-        delete customerId[socket.id];
-        io.to("customer").emit("chat", users);
+        delete usersSocket[socket.id];
+        delete cuSocket[socket.id];
+        io.to("customer").emit("chat", usersSocket);
     });
 
 });
@@ -68,10 +73,6 @@ app.get('/client', function (req, res) {
 });
 app.get('/customer', function (req, res) {
     res.sendFile('indexk.html', { root: __dirname });
-});
-
-app.post('/sendHi', function (req, res) {
-
 });
 
 app.get('/showUser', function (req, res) {

@@ -8,7 +8,11 @@
 
 <script>
    const socket = io();
-
+   var data = {
+   type  : "RFW" ,
+   username: "myName" 
+}
+   socket.emit("WaterTruck", data);
    socket.emit('readyForWork', { userId: 'client1' });
    socket.on("connect", () => {
       console.log(socket.id);

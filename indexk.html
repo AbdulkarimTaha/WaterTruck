@@ -7,20 +7,22 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
-
+var data = {
+   type  : "AU" ,
+   username: "myName" 
+}
    const socket = io();
 
    socket.on("connect", () => {
-     
-      socket.emit("AllUsers", "users");
+      socket.emit("WaterTruck", data);
    });
-
-   
   
    socket.on("chat", function (arg) {
+      
       console.log("clientererer" , arg); 
       
     });
+
    function myFunction() {
       console.log("pre")
       socket.emit("askForTruck", {
