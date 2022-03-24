@@ -10,26 +10,26 @@
 
    const socket = io();
 
+   socket.on("connect", () => {
+     
+      socket.emit("AllUsers", "users");
+   });
+
    
-   socket.emit('AllUsers',{userId:'customer1323456'});
- 
-
-    socket.on("connect", () => {
-    console.log(socket.id);   
+  
+   socket.on("chat", function (arg) {
+      console.log("clientererer" , arg); 
+      
     });
-
-    socket.on("clientList", (ad) => {
-       console.log(ad);   
-    });
-    socket.on("chat", (ad) => {
-       console.log("chat = " , ad );   
-    });
-
-    socket.emit('askForUser',"looll");
-    
-    function myFunction(){
-      socket.emit('askForUser',"looll");
-    }
+   function myFunction() {
+      console.log("pre")
+      socket.emit("askForTruck", {
+         name: "hooo",
+         location: "jordan",
+         water: 3,
+         time: 123
+      });
+   }
 </script>
 
 <body>

@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>Client</title>
-   </head>
-   <script src = "/socket.io/socket.io.js"></script>
-   
-   <script>
-       const socket = io();
 
-       socket.emit('readyForWork',{userId:'client1'});
-       socket.on("connect", () => {
-       console.log(socket.id);   
-       });
+<head>
+   <title>Client</title>
+</head>
+<script src="/socket.io/socket.io.js"></script>
 
-   </script>
-   <body><div id="gg"></div>
-      <button onclick="myFunction()">Click me</button></body>
+<script>
+   const socket = io();
+
+   socket.emit('readyForWork', { userId: 'client1' });
+   socket.on("connect", () => {
+      console.log(socket.id);
+   });
+
+
+   socket.on('username', (data) => {
+      console.log(data);
+   });
+</script>
+
+<body>
+   <div id="gg"></div>
+   <button onclick="myFunction()">Click me</button>
+</body>
+
 </html>

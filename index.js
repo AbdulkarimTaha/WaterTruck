@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const crypto = require('crypto');
 const express = require('express');
+const { accepts } = require('express/lib/request');
 const { Dir } = require('fs');
 const app = express();
 const server = require('http').createServer(app);
@@ -14,37 +15,50 @@ app.use(express.json());
 let customerId = {};
 let users = {};
 
-io.on("connection",  (socket) => {
+var cuRoom = "customer";
 
-   
+io.on("connection", (socket) => {
 
-    socket.on('AllUsers' , function (data){
+    socket.on('WaterTruck', function (data) {
+        var type = data.type;
 
-        customerId[socket.id] = data.userId ;
-        socket.join("room");
-       
+        switch (type) {
+            case "RFW": // Ready For Work
+                users[socket.id] = data.userId;
+                break;
+            case "AU": // Into All Users Room 
+                customerId[socket.id] = data.userId;
+                socket.join(onJoin("customer"));
+                break ;
+
+
+        }
+    });
+    socket.on('AllUsers', function (data) {
+        customerId[socket.id] = data.userId;
+        socket.join(onJoin("customer"));
+        io.to("customer").emit("chat", users);
+
     });
 
-    socket.on("askForUser", function (data) {
-        io.sockets.in("room").emit('chat',users);
-    });
-      
- 
+    function onJoin(room) {
+        console.log("Joining room: " + room);
+        socket.join(room);
+        console.log(socket.id + " now in rooms ", socket.rooms);
+    }
 
-     socket.on("readyForWork",  function (data) {
-        users[socket.id] = data.userId ;
-        socket.broadcast.emit("clientList", users);
-      
+
+    socket.on("readyForWork", function (data) {
+        users[socket.id] = data.userId;
+        io.to("customer").emit("chat", users);
     });
-     
-    
-   
+
 
     socket.on("disconnect", (reason) => {
-       delete users[socket.id];
-       delete customerId[socket.id] ;
-       socket.broadcast.emit("clientList", users);
-      });
+        delete users[socket.id];
+        delete customerId[socket.id];
+        io.to("customer").emit("chat", users);
+    });
 
 });
 
@@ -120,11 +134,15 @@ app.post('/customerLogin', (req, res) => {
 });
 
 
-app.post('/rateClient' , (req , res) =>{
+app.post('/rateClient', (req, res) => {
     const rateM = require('./rate');
-    rateM.rateClient(req.body, function(re){
-        console.log(re);
+    rateM.rateClient(req.body, function (re) {
+        res.status(200).json(re);
     });
+});
+
+app.post('getUserData', (req, res) => {
+    //todo : get getUserData
 });
 server.listen('3000', () => {
 });
